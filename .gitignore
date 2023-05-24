@@ -1,6 +1,12 @@
+# python virtual environment
 venv
 
-.env
-.terraform*
-
+# python cache
 */__pycache__/*
+
+# dot files
+.env
+
+# terraform files
+.terraform*
+terraform.tfstate*
