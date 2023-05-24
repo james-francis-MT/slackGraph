@@ -31,3 +31,28 @@ def get_user_info(use_id):
     except SlackApiError as error:
         slack_error_handler(error)
         return {}
+
+def get_channel_list(team_id):
+    try:
+        channels = []
+        complete = False
+        cursor = ''
+
+        while(not complete):
+            response = client.conversations_list(team_id=team_id, cursor=cursor)
+            print(f'status code: {response.status_code}')
+            if not response.data['ok']:
+                raise RuntimeError('received non 200 response')
+            
+            channels += response.data['channels']
+            if response.data['response_metadata']['next_cursor']:
+                cursor = response.data['response_metadata']['next_cursor']
+            else:
+                complete = True
+            print(f'total channels so far: {len(channels)}')
+        
+        return channels
+    
+    except SlackApiError as error:
+        slack_error_handler(error)
+        return {}
