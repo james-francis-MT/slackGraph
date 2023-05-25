@@ -1,4 +1,5 @@
 from slack_sdk.errors import SlackApiError
+from slack_sdk.web import WebClient
 
 def slack_error_handler(error):
     assert error.response["ok"] is False
@@ -6,10 +7,9 @@ def slack_error_handler(error):
     print(f"Got an error: {error.response['error']}")
     raise error
 
-def get_channel_members(channel_id, client):
+def get_channel_members(channel_id, client: WebClient):
     try:
         response = client.conversations_members(channel=channel_id)
-        print(response)
         print(f'status code: {response.status_code}')
         if response.data['ok'] is True:
             return response.data['members']
@@ -18,7 +18,7 @@ def get_channel_members(channel_id, client):
         slack_error_handler(error)
         return {}
 
-def get_user_info(use_id, client):
+def get_user_info(use_id, client: WebClient):
     try:
         response = client.users_info(user=use_id)
         print(f'status code: {response.status_code}')
@@ -29,7 +29,7 @@ def get_user_info(use_id, client):
         slack_error_handler(error)
         return {}
 
-def get_channel_list(team_id, client):
+def get_channel_list(team_id, client: WebClient):
     try:
         channels = []
         complete = False
@@ -47,8 +47,33 @@ def get_channel_list(team_id, client):
             else:
                 complete = True
             print(f'total channels so far: {len(channels)}')
-        
+
         return channels
+    
+    except SlackApiError as error:
+        slack_error_handler(error)
+        return {}
+    
+def get_user_list(team_id, client: WebClient):
+    try:
+        users = []
+        complete = False
+        cursor = ''
+
+        while(not complete):
+            response = client.users_list(team_id=team_id, cursor=cursor)
+            print(f'status code: {response.status_code}')
+            if not response.data['ok']:
+                raise RuntimeError('received non 200 response')
+            
+            users += response.data['members']
+            if response.data['response_metadata']['next_cursor']:
+                cursor = response.data['response_metadata']['next_cursor']
+                print(f'total users so far: {len(users)}')
+            else:
+                complete = True
+        
+        return users
     
     except SlackApiError as error:
         slack_error_handler(error)
