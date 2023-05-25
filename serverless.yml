@@ -1,0 +1,63 @@
+service: slack-grapher
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: jf
+  region: eu-west-2
+
+plugins:
+  - serverless-step-functions
+	
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!venv/**'
+    - '!slack_data_scripts/**'
+    - '!terraform/**'
+
+
+functions:
+  hello:
+    handler: functions/handler.hello
+
+stepFunctions:
+  stateMachines:
+    data_processor:
+      role: arn:aws:iam::261219435789:role/sm-role
+      name: myStateMachine
+      definition:
+        Comment: A description of my state machine
+        StartAt: s3 map
+        States:
+          s3 map:
+            Type: Map
+            ItemProcessor:
+              ProcessorConfig:
+                Mode: DISTRIBUTED
+                ExecutionType: EXPRESS
+              StartAt: Lambda Invoke
+              States:
+                Lambda Invoke:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  OutputPath: $.Payload
+                  Parameters:
+                    Payload.$: $
+                    FunctionName: >-
+                      arn:aws:lambda:eu-west-2:261219435789:function:slack-grapher-jf-hello:$LATEST
+                  End: true
+            ItemReader:
+              Resource: arn:aws:states:::s3:listObjectsV2
+              Parameters:
+                Bucket: slack-data-store
+            MaxConcurrency: 5
+            ItemBatcher:
+              MaxItemsPerBatch: 20
+            Label: S3objectkeys
+            End: true
+
+      

@@ -1,0 +1,21 @@
+{
+  "name": "slackgraph",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "package": "./node_modules/serverless/bin/serverless.js package",
+    "deploy": "./node_modules/serverless/bin/serverless.js deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/james-francis-MT/slackGraph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless": "^3.31.0"
+  },
+  "devDependencies": {
+    "serverless-step-functions": "^3.13.1"
+  }
+}
