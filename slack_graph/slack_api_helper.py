@@ -1,8 +1,4 @@
-import os
-from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-
-client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 def slack_error_handler(error):
     assert error.response["ok"] is False
@@ -10,9 +6,10 @@ def slack_error_handler(error):
     print(f"Got an error: {error.response['error']}")
     raise error
 
-def get_channel_members(channel_id):
+def get_channel_members(channel_id, client):
     try:
         response = client.conversations_members(channel=channel_id)
+        print(response)
         print(f'status code: {response.status_code}')
         if response.data['ok'] is True:
             return response.data['members']
@@ -21,7 +18,7 @@ def get_channel_members(channel_id):
         slack_error_handler(error)
         return {}
 
-def get_user_info(use_id):
+def get_user_info(use_id, client):
     try:
         response = client.users_info(user=use_id)
         print(f'status code: {response.status_code}')
@@ -32,7 +29,7 @@ def get_user_info(use_id):
         slack_error_handler(error)
         return {}
 
-def get_channel_list(team_id):
+def get_channel_list(team_id, client):
     try:
         channels = []
         complete = False
