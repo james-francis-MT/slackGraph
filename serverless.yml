@@ -11,6 +11,7 @@ provider:
 
 plugins:
   - serverless-step-functions
+  - serverless-iam-roles-per-function
 	
 package:
   patterns:
@@ -23,6 +24,17 @@ package:
 functions:
   hello:
     handler: functions/handler.hello
+    layers: arn:aws:lambda:eu-west-2:898466741470:layer:psycopg2-py38:1
+    environment:
+      DB_PASSWORD: slackgraph
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - s3:GetObject        
+        Resource: "*"
+    
+
+    
 
 stepFunctions:
   stateMachines:

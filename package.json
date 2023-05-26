@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "package": "./node_modules/serverless/bin/serverless.js package",
-    "deploy": "./node_modules/serverless/bin/serverless.js deploy"
+    "deploy": "./node_modules/serverless/bin/serverless.js deploy",
+    "sls": "./node_modules/serverless/bin/serverless.js"
   },
   "repository": {
     "type": "git",
@@ -16,6 +17,7 @@
     "serverless": "^3.31.0"
   },
   "devDependencies": {
+    "serverless-iam-roles-per-function": "^3.2.0",
     "serverless-step-functions": "^3.13.1"
   }
 }
